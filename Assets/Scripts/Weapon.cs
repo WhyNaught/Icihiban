@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
+using Unity.VisualScripting;
 
 public class Weapon : MonoBehaviour {
     public GameObject bulletPrefab; // this will be what the object actually looks like from my understanding 
@@ -8,9 +10,14 @@ public class Weapon : MonoBehaviour {
     public float bulletLife = 3f; // time before bullet expires
     public float bulletCooldown = 0.1f; 
     private bool canFire = true; 
+    private bool reloading = false; 
 
-    private int magazineSize = 12; // size of ammo we start with 
-    private int ammo = 12; // keeps track of how much ammmo we have 
+    [Header("Ammunition")]
+    public int magazineSize = 12; // size of ammo we start with 
+    public int ammo = 12; // keeps track of how much ammmo we have 
+
+    public TMP_Text ammoText; 
+
     private float reloadTime = 2f; 
 
     public Transform playerOrientation; 
@@ -28,11 +35,13 @@ public class Weapon : MonoBehaviour {
 
     private IEnumerator Reload(float reloadTime) {
         canFire = false; // we make sure that we cannot fire during the reload 
-        Debug.Log("Reloading...");
+        reloading = true; 
+        UpdateAmmoUi(); 
         yield return new WaitForSeconds(reloadTime);
         ammo = magazineSize; 
         canFire = true; 
-        Debug.Log("Reloaded weapon!");
+        reloading = false; 
+        UpdateAmmoUi(); 
     }
 
     private void FireWeapon() { // instantiates the bullet by creatinfg a new bullet object
@@ -42,7 +51,22 @@ public class Weapon : MonoBehaviour {
         StartCoroutine(DestroyBullet(bullet, bulletLife));  
         StartCoroutine(GunCooldown(bulletCooldown));
         ammo--; 
+        UpdateAmmoUi(); 
         if (ammo <= 0) {StartCoroutine(Reload(reloadTime));} // auto call reload is we need to 
+    }
+
+    private void UpdateAmmoUi() {
+        if (ammoText != null && reloading == false) {
+            ammoText.text = ammo.ToString() + " / " + magazineSize.ToString(); 
+        } else if (ammoText != null) {
+            ammoText.text = "Reloading..."; 
+        }
+    }
+
+    void Start()
+    {
+        ammo = magazineSize; 
+        UpdateAmmoUi(); 
     }
 
     void Update()
