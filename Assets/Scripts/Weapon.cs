@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
-using Unity.VisualScripting;
 
 public class Weapon : MonoBehaviour {
     public GameObject bulletPrefab; // this will be what the object actually looks like from my understanding 
@@ -71,6 +70,13 @@ public class Weapon : MonoBehaviour {
 
     void Update()
     {
+        Transform oldParent = transform.parent;
+        transform.parent = null;
+        transform.localScale = new Vector3(0.2f, 0.2f, 1f); // set this to the scaling of the weapon in-game
+        transform.parent = oldParent; 
+        // if this ever breaks, we need to create a third object and store the player and the weapon under that object. 
+        // we will need to add some code to make sure that the position of the weapon relative to the player stays the same though
+
         if (Input.GetKeyDown(KeyCode.Mouse0) && canFire && ammo > 0) {
             FireWeapon();  
         } else if (Input.GetKey(KeyCode.R) && ammo < magazineSize) { // this should stop us from reloading unnecessarily

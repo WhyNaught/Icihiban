@@ -1,6 +1,8 @@
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class PlayerMovement : MonoBehaviour {
     [Header("Movement")] // just lets us change this via the visual editor 
@@ -31,6 +33,7 @@ public class PlayerMovement : MonoBehaviour {
     void Start() {
         rb = GetComponent<Rigidbody>(); 
         rb.freezeRotation = true; 
+        isCrouched = false; 
     }
 
     private void MyInput() {
@@ -42,16 +45,25 @@ public class PlayerMovement : MonoBehaviour {
             Jump(); 
             Invoke(nameof(ResetJump), jumpCooldown); 
         }
-
         
-        float sprintMultiplier = Input.GetKey(KeyCode.LeftShift) ? 1.4f : 1f; 
-        tempMoveSpeed = moveSpeed * sprintMultiplier; 
+        // float sprintMultiplier = Input.GetKey(KeyCode.LeftShift) && !isCrouched ? 1.4f : 1f; 
+        float movementMultiplier = 1f; 
+        if (Input.GetKeyDown(KeyCode.LeftControl) && isGrounded) { 
+            Crouch();  
+        } else if (Input.GetKey(KeyCode.LeftShift) && isGrounded) {
+            movementMultiplier = 1.4f; 
+        } 
+        if (isCrouched) {movementMultiplier = 0.5f; }
+        tempMoveSpeed = moveSpeed * movementMultiplier; 
     }
 
     private void MovePlayer() {
         // ensures we walk where we are looking 
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput; 
-        if (isGrounded) {
+
+        moveDirection.y = 0; // MAKE SURE TO CHANGE THIS IF WE ARE ON A SLOPE LATER PLEASE 
+        
+        if (isGrounded) {  
             rb.AddForce(moveDirection.normalized * tempMoveSpeed * 10f, ForceMode.Force); 
         } else if (!isGrounded) {
             rb.AddForce(moveDirection.normalized * tempMoveSpeed * 10f * airMultiplier, ForceMode.Force); 
@@ -74,6 +86,13 @@ public class PlayerMovement : MonoBehaviour {
         // reset y velo to 0 
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private bool isCrouched = false; 
+    private void Crouch() {
+        isCrouched = !isCrouched; 
+        if (isCrouched) {transform.localScale = new Vector3(1, 0.5f, 1);}
+        else {transform.localScale = new Vector3(1, 1, 1);}
     }
 
     void Update()
