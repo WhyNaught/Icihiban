@@ -21,6 +21,7 @@ public class Weapon : MonoBehaviour {
 
     public Transform playerOrientation; 
     public Transform weaponOrientation; 
+    public PlayerStats playerStats; 
 
     private IEnumerator DestroyBullet(GameObject bullet, float bulletLife) {
         yield return new WaitForSeconds(bulletLife); 
@@ -77,9 +78,9 @@ public class Weapon : MonoBehaviour {
         // if this ever breaks, we need to create a third object and store the player and the weapon under that object. 
         // we will need to add some code to make sure that the position of the weapon relative to the player stays the same though
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && canFire && ammo > 0) {
+        if (Input.GetKeyDown(KeyCode.Mouse0) && canFire && ammo > 0 && !playerStats.isDead) {
             FireWeapon();  
-        } else if (Input.GetKey(KeyCode.R) && ammo < magazineSize) { // this should stop us from reloading unnecessarily
+        } else if (Input.GetKey(KeyCode.R) && ammo < magazineSize && !playerStats.isDead) { // this should stop us from reloading unnecessarily
             StartCoroutine(Reload(reloadTime));
         }
         weaponOrientation.rotation = playerOrientation.rotation; 

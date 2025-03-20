@@ -6,6 +6,7 @@ public class AimDownSight : MonoBehaviour
     public float zoomInDistance = 20f; // adjust for desired zoom-in distance
     public float zoomOutDistance = 60f; // adjust for desired zoom-out distance
     private float _currentZoomDistance;
+    public PlayerStats playerStats; 
 
     void Start()
     {
@@ -14,9 +15,9 @@ public class AimDownSight : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse1)) {
+        if (Input.GetKeyDown(KeyCode.Mouse1) && !playerStats.isDead) {
             _currentZoomDistance = zoomInDistance;
-        } else if (Input.GetKeyUp(KeyCode.Mouse1)) {
+        } else if (Input.GetKeyUp(KeyCode.Mouse1) || playerStats.isDead) {
             _currentZoomDistance = zoomOutDistance; 
         }
 

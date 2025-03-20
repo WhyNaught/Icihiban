@@ -94,11 +94,12 @@ public class PlayerMovement : MonoBehaviour {
         if (isCrouched) {transform.localScale = new Vector3(1, 0.5f, 1);}
         else {transform.localScale = new Vector3(1, 1, 1);}
     }
-
+    
+    public PlayerStats playerStats; 
     void Update()
     {
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-        MyInput(); 
+        if (!playerStats.isDead) {MyInput();} else if (isGrounded && playerStats.isDead) {rb.linearVelocity = new Vector3(0, 0, 0);} // prevents sliding after death 
         LimitSpeed(); 
         if (isGrounded) {
             rb.linearDamping = groundDrag; 
