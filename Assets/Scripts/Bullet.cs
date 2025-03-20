@@ -10,6 +10,6 @@ public class Bullet : MonoBehaviour {
         } else if (collision.gameObject.CompareTag("Terrain")) {
             Debug.Log("Hit the terrain!");
             Destroy(gameObject); 
-        }
+        } 
     }
 }
